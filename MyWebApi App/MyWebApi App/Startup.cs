@@ -32,6 +32,7 @@ namespace MyWebApi_App
             services.AddDbContext<MyDbContext>(option => {
                 option.UseSqlServer(Configuration.GetConnectionString("MyDB"));
             });
+            services.AddAuthentication();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "MyWebApi_App", Version = "v1" });
