@@ -27,6 +27,7 @@ namespace MyWebApi_App.Controllers
             var dsLoai = _context.Loais.ToList();
             return Ok(dsLoai);
         }
+
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
