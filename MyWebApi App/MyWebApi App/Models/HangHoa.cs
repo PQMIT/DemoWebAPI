@@ -15,4 +15,12 @@ namespace MyWebApi_App.Models
     {
         public Guid MaHangHoa { get; set; }
     }
+
+    public class HangHoaModel
+    {
+        public Guid MaHangHoa { get; set; }
+        public string TenHangHoa { get; set; }
+        public Double DonGia { get; set; }
+        public string TenLoai { get; set; }
+    }
 }
