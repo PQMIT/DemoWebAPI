@@ -1,3 +1,4 @@
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -7,18 +8,23 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using MyWebApi_App.Data;
+using MyWebApi_App.Models;
 using MyWebApi_App.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace MyWebApi_App
 {
     public class Startup
     {
+        readonly string MyAllowSpecificOrigins = "myAllowSpecificOrigins";
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -37,7 +43,40 @@ namespace MyWebApi_App
             // su dung Interface LoaiRepositoryInMemory trong services
             services.AddScoped<ILoaiRepository, LoaiRepositoryInMemory>();
             services.AddScoped<IHangHoaRepository, HangHoaRepository>();
-            services.AddAuthentication();
+
+            services.Configure<AppSetting>(Configuration.GetSection("Appsettings"));
+            var secretKey = Configuration["AppSettings:SecretKey"];
+            var secretKeyBytes = Encoding.UTF8.GetBytes(secretKey);
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(opt =>
+                {
+                    opt.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        //tự cấp token
+                        ValidateIssuer = false,
+                        ValidateAudience = false,
+
+                        //ký vào token
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(secretKeyBytes),
+
+                        ClockSkew = TimeSpan.Zero
+                    };
+                });
+            // add CORS
+            services.AddCors(options =>
+            {
+                options.AddPolicy(name: MyAllowSpecificOrigins,
+                                  builder =>
+                                  {
+                                      builder.WithOrigins("http://localhost:3000")
+                                                              .AllowAnyHeader()
+                                                        .AllowAnyMethod();
+                                  });
+            });
+
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "MyWebApi_App", Version = "v1" });
@@ -58,7 +97,12 @@ namespace MyWebApi_App
 
             app.UseRouting();
 
+            app.UseAuthentication();
+
             app.UseAuthorization();
+
+            app.UseCors(MyAllowSpecificOrigins);
+
 
             app.UseEndpoints(endpoints =>
             {

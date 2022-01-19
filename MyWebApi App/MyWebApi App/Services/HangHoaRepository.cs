@@ -10,7 +10,7 @@ namespace MyWebApi_App.Services
     public class HangHoaRepository : IHangHoaRepository
     {
         private readonly MyDbContext _context;
-        public static int PAGE_SIZE { get; set; } = 5;
+        public static int PAGE_SIZE { get; set; } = 15;
         public HangHoaRepository (MyDbContext context)
         {
             _context = context;
@@ -59,7 +59,9 @@ namespace MyWebApi_App.Services
                 MaHangHoa = hh.MaHh,
                 TenHangHoa = hh.TenHh,
                 DonGia = hh.DonGia,
-                TenLoai = hh.Loai.TenLoai
+                TenLoai = hh.Loai.TenLoai,
+                MoTa = hh.MoTa,
+                GiamGia = hh.GiamGia
             });
             return result.ToList();
         }

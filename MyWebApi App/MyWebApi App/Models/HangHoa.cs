@@ -22,5 +22,8 @@ namespace MyWebApi_App.Models
         public string TenHangHoa { get; set; }
         public Double DonGia { get; set; }
         public string TenLoai { get; set; }
+        public string MoTa { get; set; }
+        public byte GiamGia { get; set; }
+
     }
 }
